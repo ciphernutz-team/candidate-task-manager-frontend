@@ -72,16 +72,15 @@ No local server setup is required.
 
 ### Current Behavior:
 
-* Dragging tasks between columns updates the UI.
-* After refreshing the page, the task status resets.
+* Dragging tasks between columns updates the UI only (local state).
+* The backend API is **not** called when a task is dropped.
 
 ### Expected Behavior:
 
-* When a task is dropped into a new column:
+* When a task is dropped into a new column, **call the API** (PATCH) to update the task status on the backend.
+* The UI should also update to reflect the new status (via the API response or store update).
 
-  * The updated status must persist to the backend.
-  * Refreshing the page must maintain the correct state.
-* API must be properly called to update the task.
+**Note:** DummyJSON is a simulated API — it does not actually persist data. After a full page refresh, the list may revert to the original dataset. You are not required to use localStorage. The task is to implement the **correct API call** so that the update is sent to the backend; with a real backend, the state would persist after refresh.
 
 ---
 

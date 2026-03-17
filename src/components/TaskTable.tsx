@@ -1,16 +1,21 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Button } from './Button'
 import type { Task } from '../types/task'
+import { useTaskStore } from '../store/useTaskStore'
 
 interface TaskTableProps {
   tasks: Task[]
   filterStatus: string
   searchTerm: string
   onDelete: (id: string) => void
+
 }
 
 // Intentional: no React.memo — component re-renders unnecessarily when parent state changes
 export function TaskTable({ tasks, filterStatus, searchTerm, onDelete }: TaskTableProps) {
+  const page = useTaskStore((s) => s.pagination)
+  const next = useTaskStore((s) => s.pagination?.next)
+  const prev = useTaskStore((s) => s.pagination?.prev)
   // Intentional bug: filter reset logic issue — when filterStatus is '' we keep using previous filter
   const previousFilterRef = useRef<string>(filterStatus)
   if (filterStatus !== '') {
@@ -58,6 +63,12 @@ export function TaskTable({ tasks, filterStatus, searchTerm, onDelete }: TaskTab
             </tr>
           ))}
         </tbody>
+        <div className='flex justify-between items-center mt-4'>
+        <p>Total pages: {page?.totalPages}</p>
+        <button className='py-2 px-2 bg-blue-500 cursor-pointer ml-2' onClick={() => prev}>prev</button> &nbsp;&nbsp;&nbsp;&nbsp;
+        {page?.currentPage} &nbsp;&nbsp;&nbsp;&nbsp;
+        <button className='py-2 px-2 bg-blue-500 cursor-pointer ml-2' onClick={() => next}>next</button>
+        </div>
       </table>
       {filtered.length === 0 && (
         <p className="py-8 text-center text-gray-500">No tasks match your filters.</p>

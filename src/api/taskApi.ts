@@ -33,10 +33,22 @@ function mapDummyToTask(d: DummyTodo): Task {
 }
 
 export const taskApi = {
-  getTasks: async () => {
-    const res = await api.get<DummyTodosResponse>('/todos', { params: { limit: 100 } })
+  getTasks: async (page: number = 1) => {
+    const skip = (page - 1) * 5
+    const res = await api.get<DummyTodosResponse>('/todos', { params: { limit: 5, skip } })
     const tasks: Task[] = res.data.todos.map(mapDummyToTask)
-    return { data: tasks }
+    const total = res.data.total
+    const totalPages = Math.ceil(total / 5);
+    const next = page + 1
+    const prev = page - 1
+    return { data: tasks, pagination: {
+      currentPage: page,
+      totalPages,
+      pageSize: 5,
+      totalItems: total,
+      next,
+      prev
+    } }
   },
 
   postTask: async (data: CreateTaskInput) => {

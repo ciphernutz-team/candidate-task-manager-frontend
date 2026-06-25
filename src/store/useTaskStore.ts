@@ -12,6 +12,12 @@ interface TaskStore {
   deleteTask: (id: string) => Promise<void>
   setFilterStatus: (status: string) => void
   setSearchTerm: (term: string) => void
+  pagination?: {
+    currentPage: number
+    totalPages: number,
+    next?: number
+    prev?: number
+  }
 }
 
 export const useTaskStore = create<TaskStore>((set) => ({
@@ -21,7 +27,7 @@ export const useTaskStore = create<TaskStore>((set) => ({
 
   fetchTasks: async () => {
     const res = await taskApi.getTasks()
-    set({ tasks: res.data })
+    set({ tasks: res.data, pagination: res.pagination })
   },
 
   addTask: async (data: CreateTaskInput) => {
@@ -29,10 +35,16 @@ export const useTaskStore = create<TaskStore>((set) => ({
     set((state) => ({ tasks: [...state.tasks, res.data] }))
   },
 
-  updateTask: (id: string, updates: Partial<Task>) => {
+  updateTask: async(id: string, updates: Partial<Task>) => {
     set((state) => ({
       tasks: state.tasks.map((t) => (t.id === id ? { ...t, ...updates } : t)),
     }))
+    try {
+      await taskApi.patchTask(id, updates)
+    } catch (error) {
+      console.error('Failed to update task on server:', error)
+      
+    }
     // Intentional: do NOT call taskApi.patchTask here when called from Kanban drop
   },
 

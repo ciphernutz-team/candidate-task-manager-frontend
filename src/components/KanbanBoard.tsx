@@ -6,7 +6,6 @@ import {
 } from '@dnd-kit/core'
 import type { Task, TaskStatus } from '../types/task'
 import { TaskCard } from './TaskCard'
-
 const COLUMNS: TaskStatus[] = ['Todo', 'In Progress', 'Done']
 
 interface KanbanBoardProps {
